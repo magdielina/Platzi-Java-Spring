@@ -24,7 +24,7 @@ public class Producto {
     private Integer idCategoria;
 
     //    @Column(name = "codigo_barras") Not necessary
-    private Integer codigoBarras;
+    private String codigoBarras;
 
     //    @Column(name = "precio_venta") Not necessary
     private Double precioVenta;
@@ -33,4 +33,8 @@ public class Producto {
     private Integer cantidadStock;
 
     private Boolean estado;
+
+    @ManyToOne
+    @JoinColumn(name = "idCategoria", insertable = false, updatable = false)
+    private Categoria categoria;
 }
