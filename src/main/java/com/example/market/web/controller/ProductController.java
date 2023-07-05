@@ -2,14 +2,16 @@ package com.example.market.web.controller;
 
 import com.example.market.domain.dto.Product;
 import com.example.market.domain.service.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/products")
@@ -19,12 +21,19 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping()
+    @Operation(summary = "Get all supermarket products")
+    @ApiResponse(responseCode = "200", description = "OK")
     public ResponseEntity<List<Product>> getAll() {
         return new ResponseEntity<>(productService.getAll(), HttpStatus.OK);
     }
 
     @GetMapping("/category/{categoryId}")
-    public ResponseEntity<List<Product>> getByCategory(@PathVariable("categoryId") int categoryId) {
+    @Operation(summary = "Get all products by category")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Products for category not found")
+    })
+    public ResponseEntity<List<Product>> getByCategory(@Parameter(description = "Category id", required = true, example = "1") @PathVariable("categoryId") int categoryId) {
 //        return productService.getByCategory(categoryId)
 //                .map(products -> new ResponseEntity<>(products, HttpStatus.OK))
 //                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -32,7 +41,12 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProduct(@PathVariable("id") int productId) {
+    @Operation(summary = "Get a product by id")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Product not found")
+    })
+    public ResponseEntity<Product> getProduct(@Parameter(description = "Product id", required = true, example = "7") @PathVariable("id") int productId) {
 //        return productService.getProduct(productId)
 //                .map(product -> new ResponseEntity<>(product, HttpStatus.OK))
 //                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -40,12 +54,19 @@ public class ProductController {
     }
 
     @PostMapping()
+    @Operation(summary = "Create a Product")
+    @ApiResponse(responseCode = "201", description = "Product created")
     public ResponseEntity<Product> save(@RequestBody Product product) {
         return new ResponseEntity<>(productService.save(product), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity delete(@PathVariable("id")  int productId) {
+    @Operation(summary = "Delete a Product by id")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Product not found")
+    })
+    public ResponseEntity delete(@Parameter(description = "Product id", required = true) @PathVariable("id")  int productId) {
         return new ResponseEntity(productService.delete(productId) ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 }
